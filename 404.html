@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>页面迷路了 - 自动化2506窝点</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --primary-red: #9D2235;
+            --primary-dark: #2C3E50;
+            --accent-gold: #FFD700;
+            --light-bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-dark: #333333;
+            --text-light: #6C757D;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+        
+        .logo img {
+            height: 70px;
+            width: auto;
+            animation: pulse 2s infinite;
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+        
+        .logo-text p {
+            font-size: 1rem;
+            opacity: 0.9;
+            color: var(--primary-dark);
+        }
+        
+        .error-content {
+            margin: 2rem 0;
+        }
+        
+        .error-code {
+            font-size: 8rem;
+            font-weight: 900;
+            color: var(--primary-red);
+            text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.1);
+            line-height: 1;
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .error-code::before, .error-code::after {
+            content: '404';
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        
+        .error-code::before {
+            color: var(--accent-gold);
+            transform: translate(5px, 5px);
+        }
+        
+        .error-code::after {
+            color: var(--primary-dark);
+            transform: translate(10px, 10px);
+        }
+        
+        .error-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+        }
+        
+        .error-message {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: var(--text-light);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .robot {
+            font-size: 4rem;
+            margin: 2rem 0;
+            animation: bounce 2s infinite;
+            display: inline-block;
+        }
+        
+        .countdown {
+            font-size: 1.2rem;
+            margin: 2rem 0;
+            color: var(--primary-red);
+            font-weight: 600;
+        }
+        
+        .countdown-number {
+            display: inline-block;
+            min-width: 30px;
+            font-weight: 800;
+            color: var(--primary-dark);
+        }
+        
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #7a1a2a;
+            transform: translateY(-3px);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-dark);
+            border: 2px solid var(--primary-dark);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--primary-dark);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .footer {
+            margin-top: 3rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+        
+        @keyframes countdown {
+            from { transform: scale(1.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .error-code {
+                font-size: 6rem;
+            }
+            
+            .error-title {
+                font-size: 2rem;
+            }
+            
+            .logo {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <img src="https://cdn.urongda.com//images/normal/medium/xian-jiaotong-university-logo-1024px.png" alt="西安交通大学校徽">
+            <div class="logo-text">
+                <h1>西安交通大学</h1>
+                <p>自动化2506</p>
+            </div>
+        </div>
+        
+        <div class="error-content">
+            <div class="error-code">404</div>
+            <h2 class="error-title">哎呀！页面迷路了</h2>
+            <div class="robot">🤖</div>
+            <p class="error-message">
+                看起来你要找的页面被三体人带到未知领域去了。。。<br>
+                别担心，我们正在引导你返回安全区域
+            </p>
+            
+            <div class="countdown">
+                <span id="countdown-number" class="countdown-number">6</span> 秒后自动返回首页
+            </div>
+            
+            <div class="action-buttons">
+                <a href="https://auto2506.github.io" class="btn btn-primary">
+                    <i class="fas fa-home"></i> 立即返回首页
+                </a>
+                <a href="#" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> 返回上一页
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 西安交通大学自动化2506 | 蓝色奇夸克 All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        // 倒计时和跳转功能
+        let seconds = 6;
+        const countdownElement = document.getElementById('countdown-number');
+        const countdownInterval = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
+            
+            // 添加动画效果
+            countdownElement.style.animation = 'none';
+            setTimeout(() => {
+                countdownElement.style.animation = 'countdown 0.5s forwards';
+            }, 10);
+            
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                window.location.href = 'https://auto2506.github.io';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
