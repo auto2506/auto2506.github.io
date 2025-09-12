@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动化2506窝点</title>
+    <script src="//api.busuanzi.cc/static/3.6.9/busuanzi.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --primary-red: #9D2235;
+            --primary-dark: #2C3E50;
+            --accent-gold: #FFD700;
+            --light-bg: #F8F9FA;
+            --card-bg: #FFFFFF;
+            --text-dark: #333333;
+            --text-light: #6C757D;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        
+        /* 导航栏样式 - 改进版 */
+        header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-red) 100%);
+            color: white;
+            padding: 0.8rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: var(--transition);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        
+        .logo img {
+            height: 45px;
+            width: auto;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+        
+        .logo:hover img {
+            transform: rotate(5deg) scale(1.05);
+        }
+        
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .logo-text p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        
+        /* 导航菜单按钮 - 移动端 */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-gold);
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-links a.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        /* 滚动时导航栏变化 */
+        header.scrolled {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-red) 100%);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        header.scrolled .logo img {
+            height: 40px;
+        }
+        
+        /* 主横幅区域 - 美化版 */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), 
+                        url('https://lsqkk.github.io/image/bg.png') center/cover no-repeat;
+            color: white;
+            text-align: center;
+            padding: 7rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(157, 34, 53, 0.15) 0%, transparent 70%);
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 1s ease;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s forwards;
+            opacity: 0;
+        }
+        
+        .visitor-count {
+            margin: 1.5rem 0;
+            font-size: 1rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.4s forwards;
+            opacity: 0;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            animation: fadeInUp 1s ease 0.6s forwards;
+            opacity: 0;
+        }
+        
+        .btn {
+            padding: 0.9rem 2.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-red);
+            color: white;
+            box-shadow: 0 4px 15px rgba(157, 34, 53, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background-color: #7a1a2a;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(157, 34, 53, 0.4);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: white;
+            color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 功能卡片区域 - 美化版 */
+        .features {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary-dark);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-red);
+            border-radius: 2px;
+        }
+        
+        .section-title p {
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+        
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            border: none;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-red), #e74c3c);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-img {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .card:hover .card-img img {
+            transform: scale(1.05);
+        }
+        
+        .card-content {
+            padding: 1.8rem;
+        }
+        
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card h3 i {
+            color: var(--primary-red);
+        }
+        
+        .card p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-red);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            padding: 0.3rem 0;
+            position: relative;
+        }
+        
+        .card-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-red);
+            transition: var(--transition);
+        }
+        
+        .card-link:hover {
+            gap: 0.7rem;
+        }
+        
+        .card-link:hover::after {
+            width: 100%;
+        }
+        
+        /* 公告区域 - 改进版 */
+        .announcements {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .announcements::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+        }
+        
+        .announcements .section-title h2 {
+            color: white;
+        }
+        
+        .announcements .section-title p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .announcements-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .announcement-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+        
+        .announcement-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .announcement-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            color: white;
+        }
+        
+        .announcement-card h3 i {
+            color: var(--accent-gold);
+        }
+        
+        .announcement-date {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .announcement-card p {
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.7;
+        }
+        
+        .view-all {
+            text-align: center;
+            margin-top: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 班级工作日志区域 */
+        .work-log {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--light-bg);
+        }
+        
+        .log-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .log-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .log-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background-color: var(--primary-dark);
+            border-radius: 3px 0 0 3px;
+        }
+        
+        .log-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .log-date {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .log-card h3 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .log-content {
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+        
+        .log-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+        
+        .log-content a {
+            color: var(--primary-red);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .log-content a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            display: flex;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-modal:hover {
+            color: var(--primary-red);
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h2 {
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal-date {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .modal-body {
+            color: var(--text-dark);
+            line-height: 1.8;
+        }
+        
+        .modal-body img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+        
+        .modal-body a {
+            color: var(--primary-red);
+            text-decoration: none;
+        }
+        
+        .modal-body a:hover {
+            text-decoration: underline;
+        }
+        
+        /* 页脚样式 - 改进版 */
+        footer {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 5rem 2rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, var(--primary-red), var(--accent-gold));
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-logo img {
+            height: 50px;
+            width: auto;
+            border-radius: 50%;
+        }
+        
+        .footer-logo-text h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+        }
+        
+        .footer-logo-text p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        .contact-info {
+            margin: 2.5rem 0;
+        }
+        
+        .contact-title {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 0.5rem;
+        }
+        
+        .contact-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 2px;
+            background-color: var(--accent-gold);
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: var(--transition);
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+        }
+        
+        .contact-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .contact-item i {
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .copyright {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+        
+        /* 响应式设计 - 增强版 */
+        @media (max-width: 992px) {
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2.2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: row;
+                gap: 1rem;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-red) 100%);
+                flex-direction: column;
+                align-items: center;
+                gap: 0;
+                padding: 1rem 0;
+                box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+                transform: translateY(-10px);
+                opacity: 0;
+                pointer-events: none;
+                transition: var(--transition);
+            }
+            
+            .nav-links.active {
+                transform: translateY(0);
+                opacity: 1;
+                pointer-events: all;
+            }
+            
+            .nav-links a {
+                width: 100%;
+                text-align: center;
+                padding: 0.8rem;
+                margin: 0.2rem 0;
+            }
+            
+            .hero {
+                padding: 5rem 2rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title p {
+                font-size: 1rem;
+            }
+            
+            .features, .announcements, .work-log {
+                padding: 4rem 2rem;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                max-height: 75vh;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .logo-text h1 {
+                font-size: 1.1rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .card-content, .announcement-card, .log-card {
+                padding: 1.5rem;
+            }
+            
+            .contact-links {
+                gap: 1rem;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .contact-item {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 加载动画 */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <img src="https://cdn.urongda.com//images/normal/medium/xian-jiaotong-university-logo-1024px.png" alt="西安交通大学校徽">
+                <div class="logo-text">
+                    <h1>西安交通大学</h1>
+                    <p>自动化2506答疑互助网站</p>
+                </div>
+            </div>
+            <button class="menu-toggle" aria-label="菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links">
+                <a href="#" class="active"><i class="fas fa-home"></i> 首页</a>
+                <a href="https://github.com/auto2506/auto2506.github.io/tree/main/%E8%B5%84%E6%96%99"><i class="fas fa-book"></i> 资料</a>
+                <a href="https://github.com/auto2506/auto2506.github.io/tree/main/%E7%AD%94%E7%96%99"><i class="fas fa-question-circle"></i> 答疑</a>
+                <a href="https://github.com/auto2506/auto2506.github.io/blob/main/%E4%BA%92%E5%8A%A9%E5%8C%BA.md"><i class="fas fa-users"></i> 互助</a>
+                <a href="https://github.com/auto2506/auto2506.github.io/blob/main/readme.md"><i class="fas fa-user"></i> 关于</a>
+                <a href="#announcements"><i class="fas fa-bullhorn"></i> 公告</a>
+                <a href="#work-log"><i class="fas fa-file-alt"></i> 日志</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主横幅区域 -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>自动化2506学习交流平台</h2>
+            <p>资源共享 · 学习互助 · 共同进步</p>
+            <p class="visitor-count">本页来过 <span id="busuanzi_site_pv">加载中...</span> 人次</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/auto2506/auto2506.github.io/tree/main/%E8%B5%84%E6%96%99" class="btn btn-primary"><i class="fas fa-download"></i> 获取学习资料</a>
+                <a href="https://github.com/auto2506/auto2506.github.io/tree/main/%E7%AD%94%E7%96%99" class="btn btn-secondary"><i class="fas fa-question-circle"></i> 提问答疑</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能卡片区域 -->
+    <section class="features">
+        <div class="section-title">
+            <h2>网站功能</h2>
+            <p>为自动化2506班同学提供全方位的学习支持平台</p>
+        </div>
+        <div class="cards-container">
+            <div class="card">
+                <div class="card-img">
+                    <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="资料共享">
+                </div>
+                <div class="card-content">
+                    <h3><i class="fas fa-book"></i> 资料共享</h3>
+                    <p>汇集各科目学习资料、课件、习题与参考答案，方便同学们随时下载学习。</p>
+                    <a href="https://github.com/auto2506/auto2506.github.io/tree/main/%E8%B5%84%E6%96%99" class="card-link">
+                        查看资料 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-img">
+                    <img src="https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="答疑中心">
+                </div>
+                <div class="card-content">
+                    <h3><i class="fas fa-question-circle"></i> 答疑中心</h3>
+                    <p>遇到学习难题？在这里提问，同学们会为您提供详细的解答和思路。</p>
+                    <a href="https://github.com/auto2506/auto2506.github.io/tree/main/%E7%AD%94%E7%96%99" class="card-link">
+                        前往答疑 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-img">
+                    <img src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80" alt="互助平台">
+                </div>
+                <div class="card-content">
+                    <h3><i class="fas fa-users"></i> 互助平台</h3>
+                    <p>组建学习小组，寻找项目伙伴，分享学习心得，共同进步与成长。</p>
+                    <a href="https://github.com/auto2506/auto2506.github.io/blob/main/%E4%BA%92%E5%8A%A9%E5%8C%BA.md" class="card-link">
+                        加入我们 <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 公告区域 -->
+    <section id="announcements" class="announcements">
+        <div class="section-title">
+            <h2>最新公告</h2>
+            <p>重要通知和活动信息</p>
+        </div>
+        <div class="announcements-container" id="announcements-container">
+            <!-- 公告内容将通过JavaScript从notice.md加载 -->
+            <div class="announcement-card loading">
+                <h3><i class="fas fa-spinner fa-spin"></i> 加载中...</h3>
+                <p>正在获取最新公告，请稍候...</p>
+            </div>
+            <div class="announcement-card loading">
+                <h3><i class="fas fa-spinner fa-spin"></i> 加载中...</h3>
+                <p>正在获取最新公告，请稍候...</p>
+            </div>
+            <div class="announcement-card loading">
+                <h3><i class="fas fa-spinner fa-spin"></i> 加载中...</h3>
+                <p>正在获取最新公告，请稍候...</p>
+            </div>
+        </div>
+        <div class="view-all">
+            <a href="https://github.com/auto2506/auto2506.github.io/blob/main/files/notice.md" class="btn btn-secondary">
+                <i class="fas fa-list"></i> 查看全部公告
+            </a>
+        </div>
+    </section>
+
+    <!-- 班级工作日志区域 -->
+    <section id="work-log" class="work-log">
+        <div class="section-title">
+            <h2>班级工作日志</h2>
+            <p>记录班级日常活动与重要事项</p>
+        </div>
+        <div class="log-container" id="log-container">
+            <!-- 日志内容将通过JavaScript从work.md加载 -->
+            <div class="log-card loading">
+                <h3><i class="fas fa-spinner fa-spin"></i> 加载中...</h3>
+                <p>正在获取最新日志，请稍候...</p>
+            </div>
+            <div class="log-card loading">
+                <h3><i class="fas fa-spinner fa-spin"></i> 加载中...</h3>
+                <p>正在获取最新日志，请稍候...</p>
+            </div>
+            <div class="log-card loading">
+                <h3><i class="fas fa-spinner fa-spin"></i> 加载中...</h3>
+                <p>正在获取最新日志，请稍候...</p>
+            </div>
+        </div>
+        <div class="view-all">
+            <a href="https://github.com/auto2506/auto2506.github.io/blob/main/files/work.md" class="btn btn-primary">
+                <i class="fas fa-file-alt"></i> 查看全部日志
+            </a>
+        </div>
+    </section>
+
+    <!-- 公告弹窗 -->
+    <div class="modal" id="announcement-modal">
+        <div class="modal-content">
+            <button class="close-modal" aria-label="关闭">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="modal-header">
+                <h2 id="modal-title"></h2>
+                <span class="modal-date" id="modal-date"></span>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="https://cdn.urongda.com//images/normal/medium/xian-jiaotong-university-logo-1024px.png" alt="西安交通大学校徽">
+                <div class="footer-logo-text">
+                    <h3>西安交通大学自动化2506班</h3>
+                    <p>共创美好学习环境</p>
+                </div>
+            </div>
+            
+            <div class="contact-info">
+                <h3 class="contact-title">联系方式</h3>
+                <div class="contact-links">
+                    <a href="https://space.bilibili.com/2105459088" class="contact-item" target="_blank">
+                        <i class="fab fa-bilibili"></i>
+                        <span>B站主页</span>
+                    </a>
+                    <a href="https://qm.qq.com/cgi-bin/qm/qr?k=J8a7fX-2a-1X1GJnXrxu5rEqQxM7iO&jump_from=webapi" class="contact-item" target="_blank">
+                        <i class="fab fa-qq"></i>
+                        <span>QQ群: 576096229</span>
+                    </a>
+                    <a href="mailto:auto2506@163.com" class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>邮箱: auto2506@163.com</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>© 2025 自动化2506 | 蓝色奇夸克 All rights reserved.</p>
+                <p>地址：陕西省西安市咸宁西路28号 | 西安交通大学兴庆校区</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 导航栏滚动效果
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+        
+        // 移动端菜单切换
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        
+        menuToggle.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
+            const icon = menuToggle.querySelector('i');
+            if (navLinks.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+        
+        // 关闭菜单当点击导航链接
+        const navItems = document.querySelectorAll('.nav-links a');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        });
+        
+        // 解析Markdown文件并提取标题、日期和内容
+        function parseMarkdown(mdContent) {
+            const items = [];
+            const sections = mdContent.split(/^# /gm).filter(section => section.trim() !== '');
+            
+            sections.forEach(section => {
+                if (!section.trim()) return;
+                
+                // 提取标题行（包含可能的日期）
+                const firstLineEnd = section.indexOf('\n');
+                const firstLine = firstLineEnd !== -1 ? section.substring(0, firstLineEnd) : section;
+                const content = firstLineEnd !== -1 ? section.substring(firstLineEnd + 1) : '';
+                
+                // 从标题中提取日期（格式：[YYYY-MM-DD]）
+                const dateMatch = firstLine.match(/\[(\d{4}-\d{2}-\d{2})\]/);
+                const date = dateMatch ? dateMatch[1] : null;
+                
+                // 提取标题文本（去除日期部分）
+                let title = date ? firstLine.replace(/\[(\d{4}-\d{2}-\d{2})\]/, '').trim() : firstLine.trim();
+                
+                items.push({
+                    title,
+                    date,
+                    content: content.trim()
+                });
+            });
+            
+            // 按日期排序（最新的在前）
+            return items.sort((a, b) => {
+                if (!a.date && !b.date) return 0;
+                if (!a.date) return 1;
+                if (!b.date) return -1;
+                return new Date(b.date) - new Date(a.date);
+            });
+        }
+        
+        // 加载公告
+        function loadAnnouncements() {
+            fetch('files/notice.md')
+                .then(response => {
+                    if (!response.ok) throw new Error('网络错误');
+                    return response.text();
+                })
+                .then(mdContent => {
+                    const announcements = parseMarkdown(mdContent);
+                    const container = document.getElementById('announcements-container');
+                    container.innerHTML = '';
+                    
+                    // 只显示前3条
+                    const recentAnnouncements = announcements.slice(0, 3);
+                    
+                    recentAnnouncements.forEach(announcement => {
+                        const card = document.createElement('div');
+                        card.className = 'announcement-card';
+                        card.innerHTML = `
+                            <h3><i class="fas fa-bullhorn"></i> ${announcement.title}</h3>
+                            ${announcement.date ? `<span class="announcement-date">${announcement.date}</span>` : ''}
+                            <p>${announcement.content.length > 100 ? announcement.content.substring(0, 100) + '...' : announcement.content}</p>
+                        `;
+                        
+                        // 点击卡片显示完整公告
+                        card.addEventListener('click', () => {
+                            const modal = document.getElementById('announcement-modal');
+                            const modalTitle = document.getElementById('modal-title');
+                            const modalDate = document.getElementById('modal-date');
+                            const modalBody = document.getElementById('modal-body');
+                            
+                            modalTitle.textContent = announcement.title;
+                            modalDate.textContent = announcement.date || '无日期';
+                            // 转换Markdown为HTML并净化
+                            modalBody.innerHTML = DOMPurify.sanitize(marked.parse(announcement.content));
+                            
+                            modal.classList.add('active');
+                            document.body.style.overflow = 'hidden'; // 防止背景滚动
+                        });
+                        
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('加载公告失败:', error);
+                    const container = document.getElementById('announcements-container');
+                    container.innerHTML = `
+                        <div class="announcement-card">
+                            <h3><i class="fas fa-exclamation-triangle"></i> 加载失败</h3>
+                            <p>无法获取公告内容，请稍后重试</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // 加载工作日志
+        function loadWorkLogs() {
+            fetch('files/work.md')
+                .then(response => {
+                    if (!response.ok) throw new Error('网络错误');
+                    return response.text();
+                })
+                .then(mdContent => {
+                    const logs = parseMarkdown(mdContent);
+                    const container = document.getElementById('log-container');
+                    container.innerHTML = '';
+                    
+                    // 只显示前3条
+                    const recentLogs = logs.slice(0, 3);
+                    
+                    recentLogs.forEach(log => {
+                        const card = document.createElement('div');
+                        card.className = 'log-card';
+                        
+                        // 处理日志内容，转换为HTML并截取显示
+                        let previewContent = log.content;
+                        // 移除Markdown图片语法以便预览
+                        previewContent = previewContent.replace(/!\[.*?\]\(.*?\)/g, '[图片]');
+                        // 移除链接语法
+                        previewContent = previewContent.replace(/\[.*?\]\(.*?\)/g, (match) => {
+                            const textMatch = match.match(/\[(.*?)\]/);
+                            return textMatch ? textMatch[1] : match;
+                        });
+                        // 截取文本
+                        if (previewContent.length > 100) {
+                            previewContent = previewContent.substring(0, 100) + '...';
+                        }
+                        
+                        card.innerHTML = `
+                            ${log.date ? `<span class="log-date">${log.date}</span>` : ''}
+                            <h3>${log.title}</h3>
+                            <div class="log-content">${previewContent}</div>
+                        `;
+                        
+                        container.appendChild(card);
+                    });
+                })
+                .catch(error => {
+                    console.error('加载日志失败:', error);
+                    const container = document.getElementById('log-container');
+                    container.innerHTML = `
+                        <div class="log-card">
+                            <h3><i class="fas fa-exclamation-triangle"></i> 加载失败</h3>
+                            <p>无法获取日志内容，请稍后重试</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        // 关闭公告弹窗
+        document.querySelector('.close-modal').addEventListener('click', () => {
+            const modal = document.getElementById('announcement-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 恢复背景滚动
+        });
+        
+        // 点击弹窗外部关闭
+        document.getElementById('announcement-modal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('announcement-modal')) {
+                document.getElementById('announcement-modal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // 页面加载完成后加载数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAnnouncements();
+            loadWorkLogs();
+            
+            // 访客计数加载
+            setTimeout(() => {
+                const visitorCount = document.getElementById('busuanzi_site_pv');
+                if (visitorCount.textContent === '加载中...') {
+                    visitorCount.textContent = '未知';
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
